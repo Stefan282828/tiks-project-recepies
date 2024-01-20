@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodExplorer - Sastojci</title>
+    <link rel="stylesheet" href="stillsastojak.css">
+</head>
+<body>
+
+<div id="app">
+    <div class="flex-container">
+        <div class="left-panel">
+            <h2>Kreiranje sastojka</h2>
+            <form id="createForm">
+                <label for="naziv">Naziv:</label>
+                <input type="text" name="naziv" required>
+                <button type="submit">Dodaj</button>
+            </form>
+
+            <h2>Izmeni sastojak</h2>
+            <form id="updateForm">
+                <label for="updateNaziv">Naziv:</label>
+                <input type="text" id="updateNazivInput" required>
+                <button type="button" id="fetchSastojak">Prikazi podatke sastojka</button>
+                <label for="updateNaziv">Novi naziv:</label>
+                <input type="text" id="updateNaziv">
+                <button type="submit">Izmeni</button>
+            </form>
+            
+            <h2>Brisanje sastojka</h2>
+            <form id="deleteForm">
+                <label for="deleteNaziv">Naziv sastojka:</label>
+                <input type="text" id="deleteNaziv" required>
+                <button type="submit">Obrisi</button>
+            </form>
+        </div>
+
+        <div class="right-panel">
+            <h2>Lista sastojaka</h2>
+            <ul id="sastojakList"></ul>
+        </div>
+    </div>
+</div>
+
+<script src="../js/Sastojak.js"></script>
+</body>
+</html>
