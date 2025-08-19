@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodExplorer</title>
+    <link rel="stylesheet" href="still.css">
+</head>
+<body>
+
+<div id="app">
+    <div class="flex-container">
+        <div class="left-panel">
+            <h2>Kreiranje recepata</h2>
+            <form id="createForm">
+                <label for="naziv">Naziv:</label>
+                <input type="text" name="naziv" required>
+                <label for="opis">Opis:</label>
+                <input type="text" name="opis" required>
+                <label for="vremePr">Vreme pripreme:</label>
+                <input type="number" name="vremePr" required>
+                <label for="kategorija">Kategorija:</label>
+                <input type="text" name="kategorija" required>
+                <label for="uputstvoPr">Uputstvo pripreme:</label>
+                <input type="text" name="uputstvoPr" required>
+                <button type="submit">Dodaj</button>
+            </form>
+
+            <h2>Izmeni recept</h2>
+            <form id="updateForm">
+                <label for="updateNaziv">Naziv:</label>
+                <input type="text" id="updateNazivInput" required>
+                <button type="button" id="fetchRecept">Prikazi podatke recepta</button>
+                <label for="updateOpis">Opis:</label>
+                <input type="text" id="updateOpis">
+                <label for="updateKategorija">Kategorija:</label>
+                <input type="text" id="updateKategorija">
+                <label for="updateUputstvo">Uputstvo Pripreme:</label>
+                <input type="text" id="updateUputstvo">
+                <button type="submit">Izmeni</button>
+            </form>
+            
+            
+            <h2>Dodaj sastojak receptu</h2>
+            <form id="sastojakForm">
+                <label for="naziv">Naziv recepta:</label>
+                <input type="text" name="naziv" required>
+                <label for="teams">Izaberite sastojak koji dodajete:</label>
+                <select id="sastojci" multiple>
+                </select>
+                <button type="submit">Dodaj</button>
+            </form>
+            
+            <h2>Brisanje recepta</h2>
+            <form id="deleteForm">
+                <label for="deleteNaziv">Naziv recepta:</label>
+                <input type="text" id="deleteNaziv" required>
+                <button type="submit">Obrisi</button>
+            </form>
+        </div>
+
+        <div class="right-panel">
+            <h2>Lista recepata</h2>
+            <ul id="receptList"></ul>
+        </div>
+    </div>
+</div>
+
+<script src="../js/Recept.js"></script>
+</body>
+</html>
