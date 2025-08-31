@@ -1,149 +1,66 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Neo4jClient;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FoodExplorer.Models;
+using FoodExplorer.Models.Dto;
+using FoodExplorer.Services;
+
+
 namespace FoodExplorer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Podkategorija")]
     public class PodkategorijaController : ControllerBase
     {
-        private readonly IGraphClient _neo4JClient;
+        private readonly IPodkategorijaService _service;
 
-        private readonly ILogger<PodkategorijaController> _logger;
-
-        public PodkategorijaController(IGraphClient neo4JClient, ILogger<PodkategorijaController> logger)
+        public PodkategorijaController(IPodkategorijaService service)
         {
-            _neo4JClient = neo4JClient;
+            _service = service;
         }
 
-        [HttpPost("DodajPodkategoriju")]
-        public async Task<IActionResult> DodajPodKategoriju([FromBody] Podkategorija novapodkategorija)
+        [HttpPost("Dodaj")]
+        public async Task<ActionResult<Podkategorija>> Create([FromBody] PodkategorijaRequestDto dto)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                await _neo4JClient.Cypher
-                    .Create("(k:Podkategorija $podkategorijaParam)")
-                    .WithParam("podkategorijaParam", novapodkategorija)
-                    .ExecuteWithoutResultsAsync();
-
-                return Ok("Podkategorija uspešno dodata.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dodavanja podkategorije: {ex.Message}");
-            }
-        }
-        [HttpGet("VratiPodkategorije")]
-        public async Task<IActionResult> VratiPodkategorije()
-        {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var podkategorije = await _neo4JClient.Cypher
-                    .Match("(podkategorija:Podkategorija)")
-                    .Return(podkategorija => podkategorija.As<Podkategorija>())
-                    .ResultsAsync;
-
-                return Ok(podkategorije);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja podkategorija: {ex.Message}");
-            }
+            var p = await _service.CreatePodkategorijaAsync(dto);
+            return Ok(p);
         }
 
-        [HttpGet]
-        [Route("VratiPodkategorijePoNazivu/{name}")]
-        public async Task<IActionResult> PodkategorijaPoNazivu(string name)
+        [HttpGet("VratiSve")]
+        public async Task<ActionResult<IEnumerable<Podkategorija>>> GetAll()
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var recept = await _neo4JClient.Cypher
-                    .Match("(podkategorija:Podkategorija)")
-                    .Where((Podkategorija podkategorija) => podkategorija.Naziv == name)
-                    .Return(podkategorija => podkategorija.As<Podkategorija>())
-                    .ResultsAsync;
-
-                return Ok(recept.SingleOrDefault());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja podkategorije: {ex.Message}");
-            }
+            var podkategorije = await _service.GetAllPodkategorijeAsync();
+            return Ok(podkategorije);
         }
 
-        [HttpGet]
-        [Route("VratiPodkategorijePoIdu/{id}")]
-        public async Task<IActionResult> PodkategorijaPoIdu(int id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Podkategorija>> GetById(int id)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var recept = await _neo4JClient.Cypher
-                    .Match("(podkategorija:Podkategorija)")
-                    .Where((Podkategorija podkategorija) => podkategorija.Id == id)
-                    .Return(podkategorija => podkategorija.As<Podkategorija>())
-                    .ResultsAsync;
-
-                return Ok(recept.SingleOrDefault());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja podkategorije: {ex.Message}");
-            }
+            var podkategorija = await _service.GetIdAsync(id);
+            if (podkategorija == null) return NotFound();
+            return Ok(podkategorija);
         }
 
-
-        [HttpDelete("{naziv}")]
-        public async Task<IActionResult> Delete(string naziv)
+        [HttpPut("Izmeni/{id}")]
+        public async Task<ActionResult<Podkategorija>> Update(int id, [FromBody] PodkategorijaRequestDto dto)
         {
-            await  _neo4JClient.Cypher.Match("(r:Podkategorija)")
-                                 .Where((Podkategorija r) => r.Naziv == naziv)
-                                 .Delete("r")
-                                 .ExecuteWithoutResultsAsync();
-            return Ok(new { Message = "Podkategorija uspešno obrisana." });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var updated = await _service.UpdatePodkategorijaAsync(id, dto);
+            if (updated == null) return NotFound();
+            return Ok(updated);
         }
 
-        [HttpPut("{naziv}")]
-        public async Task<IActionResult> AzurirajPodkategoriju(string naziv, [FromBody] Podkategorija azurirano)
+        [HttpDelete("Obrisi/{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var query = await _neo4JClient.Cypher
-                    .Match("(podkategorija:Podkategorija)")
-                    .Where((Podkategorija podkategorija) => podkategorija.Naziv == naziv)
-                    .Set("podkategorija = $azurirano")
-                    .WithParam("azurirano", azurirano)
-                    .Return(podkategorija => podkategorija.As<Podkategorija>())
-                    .ResultsAsync;
-
-                var azuriranje = query.SingleOrDefault();
-
-                if (azuriranje == null)
-                {
-                    return NotFound($"Podkategorija sa ID {naziv} nije pronađena.");
-                }
-
-                return Ok(azuriranje);
-            }
-            catch (Exception ex)
-            {
-                //_logger.LogError($"Greška prilikom ažuriranja recepta: {ex.Message}");
-                return BadRequest($"Greška prilikom ažuriranja recepta: {ex.Message}");
-            }
+            var deleted = await _service.DeletePodkategorijaAsync(id);
+            if (!deleted) return NotFound();
+            return Ok("Podkategorija obrisana!");
         }
     }
 }

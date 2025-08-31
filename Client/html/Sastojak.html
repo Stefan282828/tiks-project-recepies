@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,42 +7,53 @@
     <link rel="stylesheet" href="stillsastojak.css">
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">FoodExplorer</div>
+            <ul class="nav-links">
+                <li><a href="Recept.html">Recepti</a></li>
+                <li><a href="Sastojak.html" class="active">Sastojci</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<div id="app">
-    <div class="flex-container">
-        <div class="left-panel">
+    <main>
+        <section>
             <h2>Kreiranje sastojka</h2>
-            <form id="createForm">
+            <form>
                 <label for="naziv">Naziv:</label>
-                <input type="text" name="naziv" required>
+                <input type="text" id="naziv" placeholder="Unesi sastojak">
                 <button type="submit">Dodaj</button>
             </form>
+        </section>
 
+        <section>
             <h2>Izmeni sastojak</h2>
-            <form id="updateForm">
-                <label for="updateNaziv">Naziv:</label>
-                <input type="text" id="updateNazivInput" required>
-                <button type="button" id="fetchSastojak">Prikazi podatke sastojka</button>
-                <label for="updateNaziv">Novi naziv:</label>
-                <input type="text" id="updateNaziv">
+            <form>
+                <label for="nazivStari">Naziv:</label>
+                <input type="text" id="nazivStari" placeholder="Stari naziv">
+                <label for="nazivNovi">Novi naziv:</label>
+                <input type="text" id="nazivNovi" placeholder="Novi naziv">
                 <button type="submit">Izmeni</button>
             </form>
-            
+        </section>
+
+        <section>
             <h2>Brisanje sastojka</h2>
-            <form id="deleteForm">
-                <label for="deleteNaziv">Naziv sastojka:</label>
-                <input type="text" id="deleteNaziv" required>
-                <button type="submit">Obrisi</button>
+            <form>
+                <label for="nazivBrisanje">Naziv sastojka:</label>
+                <input type="text" id="nazivBrisanje" placeholder="Naziv za brisanje">
+                <button type="submit" class="danger">Obriši</button>
             </form>
-        </div>
+        </section>
 
-        <div class="right-panel">
+        <section>
             <h2>Lista sastojaka</h2>
-            <ul id="sastojakList"></ul>
-        </div>
-    </div>
-</div>
-
-<script src="../js/Sastojak.js"></script>
+            <ul id="listaSastojaka">
+                <li>Primer sastojak 1</li>
+                <li>Primer sastojak 2</li>
+            </ul>
+        </section>
+    </main>
 </body>
 </html>

@@ -1,25 +1,31 @@
-using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Caching.Memory;
+using FoodExplorer.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Neo4jClient;
+using FoodExplorer.Services;
+
 
 namespace FoodExplorer
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            // Neo4J connection
-            var neo4JClient = new BoltGraphClient(new Uri("bolt://localhost:7687"), "neo4j", "12345678");
-            neo4JClient.ConnectAsync();
-            services.AddSingleton<IGraphClient>(neo4JClient);
+            // PostgreSQL konekcija
+            services.AddDbContext<FoodExplorerContext>(options =>
+                options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
+
+            services.AddScoped<IKategorijaService, KategorijaService>();
+            services.AddScoped<IPodkategorijaService, PodkategorijaService>();
+
 
             // Swagger konfiguracija
             services.AddSwaggerGen(c =>
@@ -29,7 +35,6 @@ namespace FoodExplorer
             });
 
             services.AddMemoryCache();
-
             services.AddSignalR();
             services.AddLogging();
 
@@ -57,26 +62,22 @@ namespace FoodExplorer
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Ako si u Developmentu, možeš zadržati developer exception page
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseCors("CORS");
-
             app.UseAuthorization();
 
-            // Swagger uvek uključen
+            // Swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodExplorer API v1");
-                c.RoutePrefix = "swagger"; // Swagger dostupan na /swagger
+                c.RoutePrefix = "swagger";
             });
 
             app.UseEndpoints(endpoints =>

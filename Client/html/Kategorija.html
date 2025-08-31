@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kategorije</title>
+  <!-- Putanja do css (nalazi se u istom folderu sa html) -->
+  <link rel="stylesheet" href="kategorija.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Upravljanje Kategorijama</h1>
+
+    <!-- Forma za dodavanje -->
+    <form id="kategorijaForm">
+      <input type="text" id="naziv" placeholder="Naziv kategorije" required>
+      <button type="submit">Dodaj</button>
+    </form>
+
+    <h2>Lista kategorija</h2>
+    <ul id="kategorijaLista"></ul>
+  </div>
+
+  <!-- Ispravna putanja do js (nalazi se u ../js folderu) -->
+  <script src="../js/kategorija.js" defer></script>
+</body>
+</html>

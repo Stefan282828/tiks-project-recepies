@@ -1,78 +1,108 @@
-
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
+/* Reset osnovnog stila */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-#app {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f5f5f5;
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2c3e50;
+  padding: 15px 30px;
 }
 
-.flex-container {
-    display: flex;
+.navbar .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
 }
 
-.left-panel, .right-panel {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    margin: 10px;
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
 }
 
-.left-panel {
-    width: 400px;
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 5px;
 }
 
-.right-panel {
-    flex: 1;
+.nav-links a:hover,
+.nav-links .active {
+  background: #f39c12;
+  color: #2c3e50;
 }
 
-h2 {
-    color: #333;
+/* Glavni deo */
+main {
+  padding: 20px;
 }
 
+section {
+  background: #f4f4f4;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+section h2 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+/* Forme */
 form {
-    margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
+input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1;
 }
 
 button {
-    background-color: #4caf50;
-    color: #fff;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #45a049;
+  background: #219150;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+button.danger {
+  background: #e74c3c;
 }
 
-li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
+button.danger:hover {
+  background: #c0392b;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+  form {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
