@@ -10,10 +10,12 @@ async function loadKategorije() {
 
   data.forEach(k => {
     const li = document.createElement("li");
+    const encodedName = encodeURIComponent(k.naziv);
     li.innerHTML = `
       ${k.naziv}
       <span>
         <button onclick="izmeniKategoriju(${k.id})">✏️</button>
+        <button data-action="subcategories" onclick="window.location.href='Podkategorija.html?categoryId=${k.id}&categoryName=${encodedName}'">➕</button>
         <button onclick="obrisiKategoriju(${k.id})">🗑️</button>
       </span>
     `;
