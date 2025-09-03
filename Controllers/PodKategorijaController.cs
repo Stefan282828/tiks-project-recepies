@@ -36,6 +36,13 @@ namespace FoodExplorer.Controllers
             return Ok(podkategorije);
         }
 
+        [HttpGet("ZaKategoriju/{kategorijaId}")]
+        public async Task<ActionResult<IEnumerable<Podkategorija>>> GetByKategorija(int kategorijaId)
+        {
+            var podkategorije = await _service.GetByKategorijaIdAsync(kategorijaId);
+            return Ok(podkategorije);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Podkategorija>> GetById(int id)
         {
