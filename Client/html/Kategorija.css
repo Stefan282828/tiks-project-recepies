@@ -176,6 +176,15 @@ input[type="text"]:focus {
   background: rgba(239, 68, 68, 0.08);
 }
 
+/* Subcategories (manage) */
+#kategorijaLista li button[data-action="subcategories"] {
+  border-color: #10b981;
+  color: #10b981;
+}
+#kategorijaLista li button[data-action="subcategories"]:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
 /* Utility */
 .visually-hidden {
   position: absolute;
