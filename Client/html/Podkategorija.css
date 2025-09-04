@@ -1,10 +1,11 @@
 /* Base */
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f9;
+  background: linear-gradient(135deg, rgba(244,244,249,0.92), rgba(238,247,240,0.92)), url("https://www.transparenttextures.com/patterns/cubes.png");
   margin: 0;
   padding: 0;
   color: #1f2937;
+  background-attachment: fixed;
 }
 
 /* Layout shell */
