@@ -21,11 +21,9 @@ namespace FoodExplorer.Services
         {
             var podkategorija = new Podkategorija
             {
-                Naziv = dto.Naziv
+                Naziv = dto.Naziv,
+                KategorijaId = dto.KategorijaId
             };
-
-            // assign shadow FK KategorijaId
-            _context.Entry(podkategorija).Property("KategorijaId").CurrentValue = dto.KategorijaId;
 
             _context.Podkategorije.Add(podkategorija);
             await _context.SaveChangesAsync();
@@ -43,7 +41,7 @@ namespace FoodExplorer.Services
         public async Task<IEnumerable<Podkategorija>> GetByKategorijaIdAsync(int kategorijaId)
         {
             return await _context.Podkategorije
-                                 .Where(p => EF.Property<int?>(p, "KategorijaId") == kategorijaId)
+                                 .Where(p => p.KategorijaId == kategorijaId)
                                  .Include(p => p.Recepti)
                                  .ToListAsync();
         }
@@ -61,7 +59,7 @@ namespace FoodExplorer.Services
             if (existing == null) return null;
 
             existing.Naziv = dto.Naziv;
-            _context.Entry(existing).Property("KategorijaId").CurrentValue = dto.KategorijaId;
+            existing.KategorijaId = dto.KategorijaId;
             await _context.SaveChangesAsync();
             return existing;
         }
