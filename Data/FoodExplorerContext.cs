@@ -26,9 +26,9 @@ namespace FoodExplorer.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Podkategorija>()
-                .HasOne<Kategorija>()
+                .HasOne(p => p.Kategorija)
                 .WithMany(k => k.Podkategorije)
-                .HasForeignKey("KategorijaId") 
+                .HasForeignKey(p => p.KategorijaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReceptSastojak>()
