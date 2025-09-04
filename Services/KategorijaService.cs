@@ -63,9 +63,16 @@ public class KategorijaService : IKategorijaService
         return true;
     }
 
-    public Task AddPodkategorijaAsync(int podkategorijaId, int kategorijaId)
+    public async Task AddPodkategorijaAsync(int podkategorijaId, int kategorijaId)
     {
-        throw new NotImplementedException();
+        var kategorija = await _context.Kategorije.FirstOrDefaultAsync(k => k.Id == kategorijaId);
+        if (kategorija == null) throw new KeyNotFoundException("Kategorija nije pronađena");
+
+        var pod = await _context.Podkategorije.FirstOrDefaultAsync(p => p.Id == podkategorijaId);
+        if (pod == null) throw new KeyNotFoundException("Podkategorija nije pronađena");
+
+        pod.KategorijaId = kategorijaId;
+        await _context.SaveChangesAsync();
     }
 
 }
