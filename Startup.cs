@@ -2,6 +2,7 @@ using FoodExplorer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using FoodExplorer.Services;
+using System.Text.Json.Serialization;
 
 
 namespace FoodExplorer
@@ -21,7 +22,12 @@ namespace FoodExplorer
             services.AddDbContext<FoodExplorerContext>(options =>
                 options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+                });
 
             services.AddScoped<IKategorijaService, KategorijaService>();
             services.AddScoped<IPodkategorijaService, PodkategorijaService>();
