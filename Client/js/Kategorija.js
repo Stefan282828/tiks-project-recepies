@@ -11,14 +11,17 @@ async function loadKategorije() {
   data.forEach(k => {
     const li = document.createElement("li");
     const encodedName = encodeURIComponent(k.naziv);
+    li.classList.add("clickable-item");
     li.innerHTML = `
-      ${k.naziv}
-      <span>
-        <button onclick="izmeniKategoriju(${k.id})">✏️</button>
-        <button data-action="subcategories" onclick="window.location.href='Podkategorija.html?categoryId=${k.id}&categoryName=${encodedName}'">➕</button>
-        <button onclick="obrisiKategoriju(${k.id})">🗑️</button>
+      <span class="item-title">${k.naziv}</span>
+      <span class="item-actions">
+        <button onclick="event.stopPropagation(); izmeniKategoriju(${k.id})">✏️</button>
+        <button onclick="event.stopPropagation(); obrisiKategoriju(${k.id})">🗑️</button>
       </span>
     `;
+    li.addEventListener('click', () => {
+      window.location.href = `Podkategorija.html?categoryId=${k.id}&categoryName=${encodedName}`;
+    });
     lista.appendChild(li);
   });
 }
