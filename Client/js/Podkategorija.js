@@ -29,13 +29,10 @@ async function ensureKategorijaHeader() {
     titleEl.textContent = kategorijaNazivParam;
     return;
   }
-  try {
-    const res = await safeFetch(`${apiBaseKat}/${kategorijaId}`);
-    const data = await res.json();
-    titleEl.textContent = data.naziv || `Kategorija #${kategorijaId}`;
-  } catch (_) {
-    titleEl.textContent = `Kategorija #${kategorijaId}`;
-  }
+  const res = await safeFetch(`${apiBaseKat}/${kategorijaId}`);
+  if (!res) { titleEl.textContent = `Kategorija #${kategorijaId}`; return; }
+  const data = await res.json();
+  titleEl.textContent = data.naziv || `Kategorija #${kategorijaId}`;
 }
 
 async function loadPodkategorije() {
