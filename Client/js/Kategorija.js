@@ -54,16 +54,17 @@ document.getElementById("kategorijaForm").addEventListener("submit", async e => 
   const naziv = document.getElementById("naziv").value.trim();
   if (!naziv) return;
   try {
-    await safeFetch(`${apiBase}/Dodaj`, {
+    const r = await safeFetch(`${apiBase}/Dodaj`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ naziv })
     });
 
+    if (!r) return;
     document.getElementById("naziv").value = "";
     loadKategorije();
   } catch (err) {
-    // safeFetch already alerted
+    console.error(err);
   }
 });
 
