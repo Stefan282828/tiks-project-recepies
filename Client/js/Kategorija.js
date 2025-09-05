@@ -103,14 +103,15 @@ async function izmeniKategoriju(id, btnEl) {
     if (!noviNaziv || noviNaziv === current) { cancel(); return; }
 
     try {
-      await safeFetch(`${apiBase}/Izmeni/${id}`, {
+      const r = await safeFetch(`${apiBase}/Izmeni/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ naziv: noviNaziv })
       });
+      if (!r) { cancel(); return; }
       await loadKategorije();
     } catch (err) {
-      // already alerted
+      console.error(err);
       cancel();
     }
   });
