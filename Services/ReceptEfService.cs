@@ -2,6 +2,7 @@ using FoodExplorer.Data;
 using FoodExplorer.Models;
 using FoodExplorer.Models.Dto;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace FoodExplorer.Services
 {
