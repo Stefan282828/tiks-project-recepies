@@ -31,6 +31,7 @@ async function loadRecepti() {
     data.forEach(r => {
       const li = document.createElement('li');
       li.dataset.id = r.id;
+      li.classList.add('clickable-item');
       li.innerHTML = `
         <span class="item-title"><strong>${r.naziv}</strong> · ${r.vremePripreme} min</span>
         <span class="item-actions">
@@ -117,7 +118,14 @@ window.editRecept = editRecept;
 window.deleteRecept = deleteRecept;
 
 window.addEventListener('load', async () => {
-  if (!Number.isFinite(podId)) { alert('Nedostaje podId u URL-u'); return; }
+  // set back link with params to avoid missing-id alerts when returning
+  const back = document.querySelector('.header-link');
+  if (back) {
+    const href = `Podkategorija.html?categoryId=${getParam('categoryId') || ''}&categoryName=${encodeURIComponent(getParam('categoryName') || '')}`;
+    back.setAttribute('href', href);
+  }
   setHeader();
-  loadRecepti();
+  if (Number.isFinite(podId)) {
+    loadRecepti();
+  }
 });

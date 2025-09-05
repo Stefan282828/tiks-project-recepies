@@ -150,8 +150,9 @@ window.izmeniPodkategoriju = izmeniPodkategoriju;
 window.obrisiPodkategoriju = obrisiPodkategoriju;
 
 window.addEventListener("load", async () => {
+  // If missing id, just render empty without alerts
   if (!Number.isFinite(kategorijaId)) {
-    alert("Nedostaje categoryId u URL-u");
+    await ensureKategorijaHeader();
     return;
   }
   await ensureKategorijaHeader();
