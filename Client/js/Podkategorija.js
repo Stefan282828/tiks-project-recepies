@@ -144,6 +144,13 @@ async function obrisiPodkategoriju(id) {
 window.izmeniPodkategoriju = izmeniPodkategoriju;
 window.obrisiPodkategoriju = obrisiPodkategoriju;
 
+function setOffline(show) {
+  const notice = document.getElementById('offlineNotice');
+  if (notice) notice.style.display = show ? 'block' : 'none';
+  const form = document.getElementById('podkategorijaForm');
+  if (form) Array.from(form.querySelectorAll('input,button')).forEach(el => el.disabled = !!show);
+}
+
 window.addEventListener("load", async () => {
   // If missing id, just render empty without alerts
   if (!Number.isFinite(kategorijaId)) {
