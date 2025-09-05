@@ -38,11 +38,11 @@ async function ensureKategorijaHeader() {
 async function loadPodkategorije() {
   const lista = document.getElementById("podkategorijaLista");
   lista.innerHTML = "";
-  try {
-    const res = await safeFetch(`${apiBasePod}/ZaKategoriju/${kategorijaId}`);
-    const data = await res.json();
+  const res = await safeFetch(`${apiBasePod}/ZaKategoriju/${kategorijaId}`);
+  if (!res) { const li = document.createElement('li'); li.textContent = 'Ne mogu da učitam podkategorije (backend nedostupan).'; lista.appendChild(li); return; }
+  const data = await res.json();
 
-    data.forEach(p => {
+  data.forEach(p => {
     const li = document.createElement("li");
     li.dataset.id = p.id;
     const encodedName = encodeURIComponent(p.naziv);
@@ -59,11 +59,6 @@ async function loadPodkategorije() {
     });
     lista.appendChild(li);
   });
-} catch (err) {
-    const li = document.createElement('li');
-    li.textContent = 'Ne mogu da učitam podkategorije (backend nedostupan).';
-    lista.appendChild(li);
-  }
 }
 
 // Dodaj podkategoriju
