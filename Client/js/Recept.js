@@ -12,12 +12,27 @@ function setHeader() {
 async function safeFetch(url, opts) {
   try {
     const res = await fetch(url, opts);
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    if (!res.ok) {
+      console.warn('Server returned non-ok', res.status);
+      return null;
+    }
+    // return Response
     return res;
   } catch (e) {
-    console.error(e);
-    alert('Ne mogu da se povežem sa serverom. Proveri backend.');
-    throw e;
+    console.error('Network error', e);
+    setOffline(true);
+    return null;
+  }
+}
+
+function setOffline(show) {
+  const notice = document.getElementById('offlineNotice');
+  if (notice) notice.classList.toggle('show', !!show);
+  const form = document.getElementById('receptForm');
+  if (form) {
+    Array.from(form.querySelectorAll('input,textarea,button')).forEach(el => {
+      (el).disabled = !!show;
+    });
   }
 }
 
