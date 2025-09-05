@@ -74,13 +74,14 @@ form.addEventListener('submit', async (e) => {
   const uputstvo = document.getElementById('uputstvo').value.trim();
   if (!naziv) return;
   try {
-    await safeFetch(`${apiBaseRecept}/Dodaj`, {
+    const res = await safeFetch(`${apiBaseRecept}/Dodaj`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ naziv, opis, vremePripreme: vreme, uputstvoPripreme: uputstvo, podKategorijaId: podId })
     });
+    if (!res) return; // backend unreachable
     form.reset();
     loadRecepti();
-  } catch {}
+  } catch (e) { console.error(e); }
 });
 
 // inline edit
