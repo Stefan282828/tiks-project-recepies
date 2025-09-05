@@ -1,241 +1,123 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const receptList = document.getElementById('receptList');
-    const createForm = document.getElementById('createForm');
-    const updateForm = document.getElementById('updateForm');
-    const deleteForm = document.getElementById('deleteForm');
-    const sastojakForm = document.getElementById('sastojakForm');
-    fetchSastojke()
+const apiBaseRecept = "http://localhost:5121/Recept";
 
-    async function displayReceptList() {
-        receptList.innerHTML = '';
-        const recepti = await getRecepti();
-    
-        if (receptList) {
-            recepti.forEach(recept => {
-                const li = document.createElement('li');
-                
-                const nazivElement = document.createElement('span');
-                nazivElement.textContent = recept.naziv;
-                nazivElement.classList.add('bold-naziv');
-                
-                li.appendChild(nazivElement);
-                li.innerHTML += ` - ${recept.opis} - ${recept.kategorija} - ${recept.uputstvoPripreme}`;
-                
-                receptList.appendChild(li);
-            });
-        }
-    }
+function getParam(n) { return new URLSearchParams(location.search).get(n); }
+const podId = parseInt(getParam('podId'), 10);
+const podName = getParam('podName');
 
-    async function getRecepti() {
-        const response = await fetch('http://localhost:5121/Recept/VratiRecepte');
-        const data = await response.json();
-        return data;
-    }
+function setHeader() {
+  const el = document.getElementById('podkategorijaNaziv');
+  if (podName) el.textContent = decodeURIComponent(podName);
+}
 
-    createForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(createForm);
-        const receptData = {
-            Naziv: formData.get('naziv'),
-            Opis: formData.get('opis'),
-            VremePr: formData.get('vremePr'),
-            Kategorija: formData.get('kategorija'),
-            UputstvoPripreme: formData.get('uputstvoPr')
-        };
-        await createRecept(receptData);
-        await displayReceptList();
-        createForm.reset();
+async function safeFetch(url, opts) {
+  try {
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    alert('Ne mogu da se povežem sa serverom. Proveri backend.');
+    throw e;
+  }
+}
+
+async function loadRecepti() {
+  const lista = document.getElementById('receptLista');
+  lista.innerHTML = '';
+  try {
+    const res = await safeFetch(`${apiBaseRecept}/ZaPodkategoriju/${podId}`);
+    const data = await res.json();
+
+    data.forEach(r => {
+      const li = document.createElement('li');
+      li.dataset.id = r.id;
+      li.innerHTML = `
+        <span class="item-title"><strong>${r.naziv}</strong> · ${r.vremePripreme} min</span>
+        <span class="item-actions">
+          <button onclick="event.stopPropagation(); window.editRecept(${r.id}, this)">✏️</button>
+          <button onclick="event.stopPropagation(); window.deleteRecept(${r.id})">🗑️</button>
+        </span>
+      `;
+      lista.appendChild(li);
     });
+  } catch (e) {
+    const li = document.createElement('li');
+    li.textContent = 'Ne mogu da učitam recepte (backend nedostupan).';
+    lista.appendChild(li);
+  }
+}
 
-    async function createRecept(receptData) {
-        const response = await fetch(`http://localhost:5121/Recept/DodajRecept`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(receptData),
-        });
-
-        if (response.ok) {
-            const data = await response.text();
-            console.log('Recept created:', data);
-        } else {
-            console.error('Error creating recept:', response.statusText);
-        }
-    }
-
-
-
-    async function fetchReceptDetails() {
-        const receptName = document.getElementById('updateNazivInput').value;
-        const recept = await ReceptPoNazivu(receptName);
-    
-        console.log(recept); 
-    
-        if (recept) {
-            console.log('Setting values...'); 
-    
-            document.getElementById('updateOpis').value = recept.opis || '';
-            console.log('Opis set:', document.getElementById('updateOpis').value); 
-    
-            document.getElementById('updateKategorija').value = recept.kategorija || '';
-            console.log('Kategorija set:', document.getElementById('updateKategorija').value); 
-    
-            document.getElementById('updateUputstvo').value = recept.uputstvoPripreme || '';
-            console.log('Uputstvo Pripreme set:', document.getElementById('updateUputstvo').value); 
-        } else {
-            console.error(`Recept with name ${receptName} not found.`);
-        }
-    }
-    
-    document.getElementById('fetchRecept').addEventListener('click', fetchReceptDetails);
-    
-    async function ReceptPoNazivu(name) {
-        const response = await fetch(`http://localhost:5121/Recept/VratiReceptPoNazivu/${name}`);
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`Failed to get Recept by name ${name}.`);
-            return null;
-        }
-    }
-
-    updateForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(updateForm);
-        const receptName = document.getElementById('updateNazivInput').value;
-        
-        const recept = await ReceptPoNazivu(receptName);
-    
-        if (!recept) {
-            console.error(`Recept with name ${receptName} not found.`);
-            return;
-        }
-    
-        const updatedData = {
-            Opis: document.getElementById('updateOpis').value,
-            Kategorija: document.getElementById('updateKategorija').value,
-            UputstvoPripreme: document.getElementById('updateUputstvo').value
-        };
-    
-        await updateRecept(recept.naziv, updatedData);
-        await displayReceptList();
-        updateForm.reset();
+// create
+const form = document.getElementById('receptForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const naziv = document.getElementById('naziv').value.trim();
+  const vreme = parseInt(document.getElementById('vreme').value, 10) || 0;
+  const opis = document.getElementById('opis').value.trim();
+  const uputstvo = document.getElementById('uputstvo').value.trim();
+  if (!naziv) return;
+  try {
+    await safeFetch(`${apiBaseRecept}/Dodaj`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ naziv, opis, vremePripreme: vreme, uputstvoPripreme: uputstvo, podKategorijaId: podId })
     });
+    form.reset();
+    loadRecepti();
+  } catch {}
+});
 
-    async function updateRecept(name, updatedData) {
-        
-        const recept = await ReceptPoNazivu(name);
-        if (!recept) {
-            console.error(`Recept with name ${name} not found.`);
-            return;
-        }
-        const updatedReceptData = { ...recept, ...updatedData };
-        const response = await fetch(`http://localhost:5121/Recept/UpdateRecept/${recept.naziv}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedReceptData),
-        });
-        const data = await response.json();
-        console.log('Recept updated:', data);
-    }
+// inline edit
+async function editRecept(id, btn) {
+  const li = btn.closest('li');
+  const currentTitle = li.querySelector('.item-title');
+  const nameMatch = currentTitle.textContent.trim();
 
+  const editor = document.createElement('div');
+  editor.className = 'recipe-inline';
+  editor.innerHTML = `
+    <input class="edit-name" type="text" value="${nameMatch.replace(/"/g, '&quot;')}">
+    <input class="edit-time" type="number" placeholder="min">
+    <div>
+      <button class="inline-save">Sačuvaj</button>
+      <button class="inline-cancel">Otkaži</button>
+    </div>
+  `;
+  currentTitle.replaceWith(editor);
 
+  editor.querySelector('.inline-cancel').addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.replaceWith(currentTitle);
+  });
 
+  editor.querySelector('.inline-save').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const noviNaziv = editor.querySelector('.edit-name').value.trim();
+    const novoVreme = parseInt(editor.querySelector('.edit-time').value, 10) || 0;
+    if (!noviNaziv) { editor.replaceWith(currentTitle); return; }
+    try {
+      await safeFetch(`${apiBaseRecept}/Izmeni/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ naziv: noviNaziv, opis: '', vremePripreme: novoVreme, uputstvoPripreme: '', podKategorijaId: podId })
+      });
+      await loadRecepti();
+    } catch {}
+  });
+}
 
-    deleteForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const receptName = document.getElementById('deleteNaziv').value;
+// delete
+async function deleteRecept(id) {
+  if (!confirm('Obrisati recept?')) return;
+  try {
+    await safeFetch(`${apiBaseRecept}/Obrisi/${id}`, { method: 'DELETE' });
+    loadRecepti();
+  } catch {}
+}
 
-        const recept = await ReceptPoNazivu(receptName);
+window.editRecept = editRecept;
+window.deleteRecept = deleteRecept;
 
-        if (!recept) {
-            console.error(`Recept with name ${receptName} not found.`);
-            return;
-        }
-
-        await deleteRecept(recept.naziv);
-        await displayReceptList();
-        deleteForm.reset();
-    });
-
-    async function deleteRecept(name) {
-        const recept = await ReceptPoNazivu(name);
-        if (!recept) {
-            console.error(`Recept with name ${name} not found.`);
-            return;
-        }
-        const response = await fetch(`http://localhost:5121/Recept/ObrisiRecept/${recept.naziv}`, {
-            method: 'DELETE',
-        });
-
-        if (response.ok) {
-            console.log(`Recept ${name} deleted successfully.`);
-        } else {
-            console.error(`Failed to delete Recept ${name}.`);
-        }
-    }
-
-    async function fetchSastojke()
-    {
-        fetch('http://localhost:5121/Sastojak/VratiSastojke')
-        .then(response => response.json())
-        .then(data => {
-            const sastojciSelect = document.getElementById('sastojci');
-            data.forEach(sastojak => {
-                const option = document.createElement('option');
-                option.value = sastojak.id; 
-                option.text = `${sastojak.naziv}`; 
-                sastojciSelect.appendChild(option);
-            });
-        });
-    }
-
-    sastojakForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(sastojakForm);
-        const receptData = {
-            Naziv: formData.get('naziv')
-        };
-
-    
-        console.log(receptData.Naziv);
-        const recept = await ReceptPoNazivu(receptData.Naziv);
-        console.log(recept)
-    
-        if (!recept) {
-            console.error(`Recept with name ${receptData.Naziv} not found or missing ID.`);
-            return;
-        }
-    
-        const selectedSastojak = Array.from(document.getElementById('sastojci').selectedOptions)
-        .map(option => option.value);
-
-        console.log('Selected Sastojak:', selectedSastojak);
-
-    
-        fetch(`http://localhost:5121/Recept/dodaj-sastojak-receptu/${recept.Naziv}/${selectedSastojak.join(',')}`, {
-            method: 'POST'
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Sastojak uspešno dodat receptu');
-                
-            } else {
-                console.error('Greška prilikom dodavanja sastojaka receptu');
-            }
-        });
-    });
-    
-    
-    
-    
-
-
-    // ... (ostatak koda koji nije promenjen)
-
-    // Initial display of Recept list
-    displayReceptList();
+window.addEventListener('load', async () => {
+  if (!Number.isFinite(podId)) { alert('Nedostaje podId u URL-u'); return; }
+  setHeader();
+  loadRecepti();
 });
