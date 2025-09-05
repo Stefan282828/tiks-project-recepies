@@ -31,6 +31,7 @@ namespace FoodExplorer
 
             services.AddScoped<IKategorijaService, KategorijaService>();
             services.AddScoped<IPodkategorijaService, PodkategorijaService>();
+            services.AddScoped<IReceptService, ReceptEfService>();
 
 
             // Swagger konfiguracija
