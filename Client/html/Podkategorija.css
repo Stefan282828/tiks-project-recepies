@@ -11,8 +11,10 @@ body {
 /* Layout shell */
 .page-shell { min-height: 100vh; display: flex; flex-direction: column; }
 .top-header { background: linear-gradient(135deg, #4CAF50, #45a049); color: #fff; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.top-header__inner { max-width: 960px; margin: 0 auto; }
+.top-header__inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
 .top-header__title { margin: 0; font-size: 22px; letter-spacing: .3px; }
+.header-link { color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); transition: background .15s ease, border-color .15s ease; }
+.header-link:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.55); }
 .content-area { padding: 24px 20px 40px; flex: 1; }
 
 /* Card */
@@ -48,6 +50,12 @@ input[type="text"]:focus { border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,
 #podkategorijaLista li button:first-child:hover { background: rgba(14,165,233,.08); }
 #podkategorijaLista li button:last-child { border-color: #ef4444; color: #ef4444; }
 #podkategorijaLista li button:last-child:hover { background: rgba(239,68,68,.08); }
+
+/* Inline edit */
+.inline-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.inline-input { flex: 1; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+.inline-save { padding: 8px 12px; border-radius: 10px; border: none; background: #4CAF50; color: #fff; cursor: pointer; }
+.inline-cancel { padding: 8px 12px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; color: #374151; cursor: pointer; }
 
 /* A11y */
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
