@@ -133,10 +133,11 @@ async function izmeniPodkategoriju(id, btnEl) {
 async function obrisiPodkategoriju(id) {
   if (!confirm("Da li si siguran da želiš obrisati ovu podkategoriju?")) return;
   try {
-    await safeFetch(`${apiBasePod}/Obrisi/${id}`, { method: "DELETE" });
+    const r = await safeFetch(`${apiBasePod}/Obrisi/${id}`, { method: "DELETE" });
+    if (!r) return;
     loadPodkategorije();
   } catch (err) {
-    // already alerted
+    console.error(err);
   }
 }
 
