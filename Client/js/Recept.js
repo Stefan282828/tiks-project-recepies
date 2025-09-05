@@ -113,12 +113,13 @@ async function editRecept(id, btn) {
     const novoVreme = parseInt(editor.querySelector('.edit-time').value, 10) || 0;
     if (!noviNaziv) { editor.replaceWith(currentTitle); return; }
     try {
-      await safeFetch(`${apiBaseRecept}/Izmeni/${id}`, {
+      const res = await safeFetch(`${apiBaseRecept}/Izmeni/${id}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ naziv: noviNaziv, opis: '', vremePripreme: novoVreme, uputstvoPripreme: '', podKategorijaId: podId })
       });
+      if (!res) return;
       await loadRecepti();
-    } catch {}
+    } catch (e) { console.error(e); }
   });
 }
 
