@@ -130,5 +130,13 @@ async function obrisiKategoriju(id) {
   }
 }
 
+// Offline helper
+function setOffline(show) {
+  const notice = document.getElementById('offlineNotice');
+  if (notice) notice.style.display = show ? 'block' : 'none';
+  const form = document.getElementById('kategorijaForm');
+  if (form) Array.from(form.querySelectorAll('input,button')).forEach(el => el.disabled = !!show);
+}
+
 // Kad se stranica učita
 window.onload = loadKategorije;
