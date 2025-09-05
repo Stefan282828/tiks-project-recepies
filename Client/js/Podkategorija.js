@@ -33,11 +33,12 @@ async function loadPodkategorije() {
 
   data.forEach(p => {
     const li = document.createElement("li");
+    li.dataset.id = p.id;
     li.innerHTML = `
-      ${p.naziv}
-      <span>
-        <button onclick="window.izmeniPodkategoriju(${p.id})">✏️</button>
-        <button onclick="window.obrisiPodkategoriju(${p.id})">🗑️</button>
+      <span class=\"item-title\">${p.naziv}</span>
+      <span class=\"item-actions\">
+        <button onclick=\"window.izmeniPodkategoriju(${p.id}, this)\">✏️</button>
+        <button onclick=\"window.obrisiPodkategoriju(${p.id})\">🗑️</button>
       </span>
     `;
     lista.appendChild(li);
@@ -60,15 +61,45 @@ form.addEventListener("submit", async (e) => {
 });
 
 // Izmeni podkategoriju
-async function izmeniPodkategoriju(id) {
-  const noviNaziv = prompt("Unesi novi naziv podkategorije:");
-  if (!noviNaziv) return;
-  await fetch(`${apiBasePod}/Izmeni/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ naziv: noviNaziv, kategorijaId })
+async function izmeniPodkategoriju(id, btnEl) {
+  const li = btnEl.closest('li');
+  const title = li.querySelector('.item-title');
+  const current = title.textContent.trim();
+
+  const editor = document.createElement('div');
+  editor.className = 'inline-row';
+  editor.innerHTML = `
+    <input class=\"inline-input\" type=\"text\" value=\"${current.replace(/\"/g, '&quot;')}\" />
+    <button class=\"inline-save\">Sačuvaj</button>
+    <button class=\"inline-cancel\">Otkaži</button>
+  `;
+
+  title.replaceWith(editor);
+
+  const input = editor.querySelector('.inline-input');
+  input.focus();
+
+  const cancel = () => {
+    editor.replaceWith(title);
+  };
+
+  editor.querySelector('.inline-cancel').addEventListener('click', (e) => {
+    e.stopPropagation();
+    cancel();
   });
-  loadPodkategorije();
+
+  editor.querySelector('.inline-save').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const noviNaziv = input.value.trim();
+    if (!noviNaziv || noviNaziv === current) { cancel(); return; }
+
+    await fetch(`${apiBasePod}/Izmeni/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ naziv: noviNaziv, kategorijaId })
+    });
+    await loadPodkategorije();
+  });
 }
 
 // Obrisi podkategoriju
