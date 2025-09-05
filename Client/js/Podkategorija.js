@@ -8,6 +8,21 @@ function getQueryParam(name) {
 const kategorijaId = parseInt(getQueryParam("categoryId"), 10);
 const kategorijaNazivParam = getQueryParam("categoryName");
 
+async function safeFetch(url, opts) {
+  try {
+    const res = await fetch(url, opts);
+    if (!res.ok) {
+      const text = await res.text().catch(() => null);
+      throw new Error(`Server returned ${res.status}: ${text || res.statusText}`);
+    }
+    return res;
+  } catch (err) {
+    console.error('Fetch error:', err);
+    alert('Ne mogu da se povežem sa serverom. Proveri da li backend radi.');
+    throw err;
+  }
+}
+
 async function ensureKategorijaHeader() {
   const titleEl = document.getElementById("kategorijaNaziv");
   if (kategorijaNazivParam) {
@@ -15,11 +30,9 @@ async function ensureKategorijaHeader() {
     return;
   }
   try {
-    const res = await fetch(`${apiBaseKat}/${kategorijaId}`);
-    if (res.ok) {
-      const data = await res.json();
-      titleEl.textContent = data.naziv || `Kategorija #${kategorijaId}`;
-    }
+    const res = await safeFetch(`${apiBaseKat}/${kategorijaId}`);
+    const data = await res.json();
+    titleEl.textContent = data.naziv || `Kategorija #${kategorijaId}`;
   } catch (_) {
     titleEl.textContent = `Kategorija #${kategorijaId}`;
   }
@@ -28,21 +41,27 @@ async function ensureKategorijaHeader() {
 async function loadPodkategorije() {
   const lista = document.getElementById("podkategorijaLista");
   lista.innerHTML = "";
-  const res = await fetch(`${apiBasePod}/ZaKategoriju/${kategorijaId}`);
-  const data = res.ok ? await res.json() : [];
+  try {
+    const res = await safeFetch(`${apiBasePod}/ZaKategoriju/${kategorijaId}`);
+    const data = await res.json();
 
-  data.forEach(p => {
-    const li = document.createElement("li");
-    li.dataset.id = p.id;
-    li.innerHTML = `
-      <span class=\"item-title\">${p.naziv}</span>
-      <span class=\"item-actions\">
-        <button onclick=\"window.izmeniPodkategoriju(${p.id}, this)\">✏️</button>
-        <button onclick=\"window.obrisiPodkategoriju(${p.id})\">🗑️</button>
-      </span>
-    `;
+    data.forEach(p => {
+      const li = document.createElement("li");
+      li.dataset.id = p.id;
+      li.innerHTML = `
+        <span class=\"item-title\">${p.naziv}</span>
+        <span class=\"item-actions\">
+          <button onclick=\"window.izmeniPodkategoriju(${p.id}, this)\">✏️</button>
+          <button onclick=\"window.obrisiPodkategoriju(${p.id})\">��️</button>
+        </span>
+      `;
+      lista.appendChild(li);
+    });
+  } catch (err) {
+    const li = document.createElement('li');
+    li.textContent = 'Ne mogu da učitam podkategorije (backend nedostupan).';
     lista.appendChild(li);
-  });
+  }
 }
 
 // Dodaj podkategoriju
@@ -51,13 +70,17 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const naziv = document.getElementById("podNaziv").value.trim();
   if (!naziv) return;
-  await fetch(`${apiBasePod}/Dodaj`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ naziv, kategorijaId })
-  });
-  document.getElementById("podNaziv").value = "";
-  loadPodkategorije();
+  try {
+    await safeFetch(`${apiBasePod}/Dodaj`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ naziv, kategorijaId })
+    });
+    document.getElementById("podNaziv").value = "";
+    loadPodkategorije();
+  } catch (err) {
+    // safeFetch already alerted
+  }
 });
 
 // Izmeni podkategoriju
@@ -93,20 +116,29 @@ async function izmeniPodkategoriju(id, btnEl) {
     const noviNaziv = input.value.trim();
     if (!noviNaziv || noviNaziv === current) { cancel(); return; }
 
-    await fetch(`${apiBasePod}/Izmeni/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ naziv: noviNaziv, kategorijaId })
-    });
-    await loadPodkategorije();
+    try {
+      await safeFetch(`${apiBasePod}/Izmeni/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ naziv: noviNaziv, kategorijaId })
+      });
+      await loadPodkategorije();
+    } catch (err) {
+      // already alerted
+      cancel();
+    }
   });
 }
 
 // Obrisi podkategoriju
 async function obrisiPodkategoriju(id) {
   if (!confirm("Da li si siguran da želiš obrisati ovu podkategoriju?")) return;
-  await fetch(`${apiBasePod}/Obrisi/${id}`, { method: "DELETE" });
-  loadPodkategorije();
+  try {
+    await safeFetch(`${apiBasePod}/Obrisi/${id}`, { method: "DELETE" });
+    loadPodkategorije();
+  } catch (err) {
+    // already alerted
+  }
 }
 
 window.izmeniPodkategoriju = izmeniPodkategoriju;
