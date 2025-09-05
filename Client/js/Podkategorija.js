@@ -12,14 +12,14 @@ async function safeFetch(url, opts) {
   try {
     const res = await fetch(url, opts);
     if (!res.ok) {
-      const text = await res.text().catch(() => null);
-      throw new Error(`Server returned ${res.status}: ${text || res.statusText}`);
+      console.warn('Server returned non-ok', res.status);
+      return null;
     }
     return res;
   } catch (err) {
     console.error('Fetch error:', err);
-    alert('Ne mogu da se povežem sa serverom. Proveri da li backend radi.');
-    throw err;
+    setOffline(true);
+    return null;
   }
 }
 
