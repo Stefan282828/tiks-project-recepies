@@ -41,6 +41,7 @@ async function loadRecepti() {
   lista.innerHTML = '';
   try {
     const res = await safeFetch(`${apiBaseRecept}/ZaPodkategoriju/${podId}`);
+    if (!res) { setOffline(true); const li = document.createElement('li'); li.textContent = 'Ne mogu da učitam recepte (backend nedostupan).'; lista.appendChild(li); return; }
     const data = await res.json();
 
     data.forEach(r => {
