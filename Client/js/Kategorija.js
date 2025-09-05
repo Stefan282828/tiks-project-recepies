@@ -21,6 +21,7 @@ async function loadKategorije() {
   lista.innerHTML = "";
   try {
     const res = await safeFetch(`${apiBase}/VratiSve`);
+    if (!res) { const li = document.createElement('li'); li.textContent = 'Ne mogu da učitam kategorije (backend nedostupan).'; lista.appendChild(li); return; }
     const data = await res.json();
 
     data.forEach(k => {
