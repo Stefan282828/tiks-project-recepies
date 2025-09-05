@@ -68,15 +68,16 @@ form.addEventListener("submit", async (e) => {
   const naziv = document.getElementById("podNaziv").value.trim();
   if (!naziv) return;
   try {
-    await safeFetch(`${apiBasePod}/Dodaj`, {
+    const r = await safeFetch(`${apiBasePod}/Dodaj`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ naziv, kategorijaId })
     });
+    if (!r) return;
     document.getElementById("podNaziv").value = "";
     loadPodkategorije();
   } catch (err) {
-    // safeFetch already alerted
+    console.error(err);
   }
 });
 
