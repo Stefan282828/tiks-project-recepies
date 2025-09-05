@@ -46,18 +46,23 @@ async function loadPodkategorije() {
     const data = await res.json();
 
     data.forEach(p => {
-      const li = document.createElement("li");
-      li.dataset.id = p.id;
-      li.innerHTML = `
-        <span class=\"item-title\">${p.naziv}</span>
-        <span class=\"item-actions\">
-          <button onclick=\"window.izmeniPodkategoriju(${p.id}, this)\">✏️</button>
-          <button onclick=\"window.obrisiPodkategoriju(${p.id})\">��️</button>
-        </span>
-      `;
-      lista.appendChild(li);
+    const li = document.createElement("li");
+    li.dataset.id = p.id;
+    const encodedName = encodeURIComponent(p.naziv);
+    li.classList.add('clickable-item');
+    li.innerHTML = `
+      <span class=\"item-title\">${p.naziv}</span>
+      <span class=\"item-actions\">
+        <button onclick=\"event.stopPropagation(); window.izmeniPodkategoriju(${p.id}, this)\">✏️</button>
+        <button onclick=\"event.stopPropagation(); window.obrisiPodkategoriju(${p.id})\">🗑️</button>
+      </span>
+    `;
+    li.addEventListener('click', () => {
+      window.location.href = `Recept.html?podId=${p.id}&podName=${encodedName}`;
     });
-  } catch (err) {
+    lista.appendChild(li);
+  });
+} catch (err) {
     const li = document.createElement('li');
     li.textContent = 'Ne mogu da učitam podkategorije (backend nedostupan).';
     lista.appendChild(li);
