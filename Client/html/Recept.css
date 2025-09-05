@@ -10,3 +10,6 @@
 .recipe-inline input, .recipe-inline textarea { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
 
 @media (min-width: 740px) { .input-grid { grid-template-columns: 1fr 160px; } .input-grid textarea { grid-column: 1 / -1; } }
+
+.offline-notice { display:none; padding:10px; border-radius:10px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7; }
+.offline-notice.show { display:block; }
