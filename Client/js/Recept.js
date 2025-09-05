@@ -127,9 +127,10 @@ async function editRecept(id, btn) {
 async function deleteRecept(id) {
   if (!confirm('Obrisati recept?')) return;
   try {
-    await safeFetch(`${apiBaseRecept}/Obrisi/${id}`, { method: 'DELETE' });
+    const res = await safeFetch(`${apiBaseRecept}/Obrisi/${id}`, { method: 'DELETE' });
+    if (!res) return;
     loadRecepti();
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 window.editRecept = editRecept;
