@@ -122,10 +122,11 @@ async function obrisiKategoriju(id) {
   if (!confirm("Da li si siguran da želiš obrisati ovu kategoriju?")) return;
 
   try {
-    await safeFetch(`${apiBase}/Obrisi/${id}`, { method: "DELETE" });
+    const r = await safeFetch(`${apiBase}/Obrisi/${id}`, { method: "DELETE" });
+    if (!r) return;
     loadKategorije();
   } catch (err) {
-    // already alerted
+    console.error(err);
   }
 }
 
