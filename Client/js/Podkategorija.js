@@ -115,14 +115,15 @@ async function izmeniPodkategoriju(id, btnEl) {
     if (!noviNaziv || noviNaziv === current) { cancel(); return; }
 
     try {
-      await safeFetch(`${apiBasePod}/Izmeni/${id}`, {
+      const r = await safeFetch(`${apiBasePod}/Izmeni/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ naziv: noviNaziv, kategorijaId })
       });
+      if (!r) { cancel(); return; }
       await loadPodkategorije();
     } catch (err) {
-      // already alerted
+      console.error(err);
       cancel();
     }
   });
