@@ -153,9 +153,17 @@ function setOffline(show) {
 }
 
 window.addEventListener("load", async () => {
-  // If missing id, just render empty without alerts
-  if (!Number.isFinite(kategorijaId)) {
-    await ensureKategorijaHeader();
+  // If params missing, restore from localStorage or go back to Kategorija
+  if (!Number.isFinite(kategorijaId) || !kategorijaNazivParam) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('lastCategory') || 'null');
+      if (saved && Number.isFinite(saved.id)) {
+        const name = encodeURIComponent(saved.name || '');
+        window.location.replace(`Podkategorija.html?categoryId=${saved.id}&categoryName=${name}`);
+        return;
+      }
+    } catch {}
+    window.location.href = 'Kategorija.html';
     return;
   }
   await ensureKategorijaHeader();
