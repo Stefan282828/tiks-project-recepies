@@ -59,7 +59,7 @@ async function loadRecepti() {
       li.addEventListener('click', async () => {
         // toggle details
         const existing = li.querySelector('.recipe-details');
-        if (existing) { existing.remove(); return; }
+        if (existing) { existing.remove(); li.classList.remove('has-details'); return; }
         // fetch details if not fully present
         let rec = r;
         if (!rec.opis || !rec.uputstvoPripreme) {
@@ -69,10 +69,11 @@ async function loadRecepti() {
         const det = document.createElement('div');
         det.className = 'recipe-details';
         det.innerHTML = `
-          <div class="detail-row"><strong>Opis:</strong> ${rec.opis || '—'}</div>
-          <div class="detail-row"><strong>Vreme pripreme:</strong> ${rec.vremePripreme ?? '—'} ${rec.vremePripreme ? 'min' : ''}</div>
-          <div class="detail-row"><strong>Uputstvo:</strong> ${rec.uputstvoPripreme || '—'}</div>
+          <div class="detail-row"><span class="field-label">Opis</span><div class="field-value">${rec.opis || '—'}</div></div>
+          <div class="detail-row"><span class="field-label">Vreme</span><div class="field-value">${rec.vremePripreme ?? '—'} ${rec.vremePripreme ? 'min' : ''}</div></div>
+          <div class="detail-row"><span class="field-label">Uputstvo</span><div class="field-value">${rec.uputstvoPripreme || '—'}</div></div>
         `;
+        li.classList.add('has-details');
         li.appendChild(det);
       });
       lista.appendChild(li);
