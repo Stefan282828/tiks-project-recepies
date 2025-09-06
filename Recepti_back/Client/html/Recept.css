@@ -1,0 +1,12 @@
+/* Base align with other pages */
+@import url('Kategorija.css');
+
+/* Override/add form grid for recipes */
+.input-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.input-grid textarea { min-height: 100px; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; resize: vertical; }
+
+/* Inline edit for recipe rows */
+.recipe-inline { display: grid; grid-template-columns: 1.2fr .6fr 1fr; gap: 10px; align-items: center; width: 100%; }
+.recipe-inline input, .recipe-inline textarea { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+
+@media (min-width: 740px) { .input-grid { grid-template-columns: 1fr 160px; } .input-grid textarea { grid-column: 1 / -1; } }
