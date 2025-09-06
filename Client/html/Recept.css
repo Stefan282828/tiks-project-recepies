@@ -14,5 +14,9 @@
 .offline-notice { display:none; padding:10px; border-radius:10px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7; }
 .offline-notice.show { display:block; }
 
-.recipe-details { margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; color:#374151; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
-.recipe-details .detail-row { margin: 6px 0; }
+.category-list li.has-details { flex-direction: column; align-items: stretch; }
+.category-list li.has-details .item-actions { align-self: flex-end; }
+.recipe-details { width: 100%; margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; color:#374151; white-space: pre-wrap; word-break: break-word; line-height: 1.5; max-height: 320px; overflow: auto; }
+.recipe-details .detail-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin: 8px 0; }
+.recipe-details .field-label { font-weight: 600; color:#111827; }
+.recipe-details .field-value { color:#374151; }
