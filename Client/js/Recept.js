@@ -109,34 +109,45 @@ form.addEventListener('submit', async (e) => {
 async function editRecept(id, btn) {
   const li = btn.closest('li');
   const currentTitle = li.querySelector('.item-title');
-  const nameMatch = currentTitle.textContent.trim();
+  const currentName = (currentTitle?.textContent || '').trim();
+
+  // fetch full data to prefill
+  let rec = { naziv: currentName, opis: '', vremePripreme: 0, uputstvoPripreme: '' };
+  const resp = await safeFetch(`${apiBaseRecept}/${id}`);
+  if (resp) {
+    try { rec = await resp.json(); } catch {}
+  }
 
   const editor = document.createElement('div');
-  editor.className = 'recipe-inline';
+  editor.className = 'recipe-editor';
   editor.innerHTML = `
-    <input class="edit-name" type="text" value="${nameMatch.replace(/"/g, '&quot;')}">
-    <input class="edit-time" type="number" placeholder="min">
-    <div>
-      <button class="inline-save">Sačuvaj</button>
-      <button class="inline-cancel">Otkaži</button>
-    </div>
+    <div class="form-row"><span class="field-label">Naziv</span><input class="edit-name" type="text" value="${(rec.naziv || '').replace(/"/g, '&quot;')}"></div>
+    <div class="form-row"><span class="field-label">Vreme (min)</span><input class="edit-time" type="number" min="0" value="${rec.vremePripreme || 0}"></div>
+    <div class="form-row"><span class="field-label">Opis</span><textarea class="edit-opis">${rec.opis || ''}</textarea></div>
+    <div class="form-row"><span class="field-label">Uputstvo</span><textarea class="edit-uput">${rec.uputstvoPripreme || ''}</textarea></div>
+    <div class="editor-actions"><button class="inline-save">Sačuvaj</button><button class="inline-cancel">Otkaži</button></div>
   `;
+
   currentTitle.replaceWith(editor);
+  li.classList.add('has-details');
 
   editor.querySelector('.inline-cancel').addEventListener('click', (e) => {
     e.stopPropagation();
     editor.replaceWith(currentTitle);
+    li.classList.remove('has-details');
   });
 
   editor.querySelector('.inline-save').addEventListener('click', async (e) => {
     e.stopPropagation();
     const noviNaziv = editor.querySelector('.edit-name').value.trim();
     const novoVreme = parseInt(editor.querySelector('.edit-time').value, 10) || 0;
-    if (!noviNaziv) { editor.replaceWith(currentTitle); return; }
+    const noviOpis = editor.querySelector('.edit-opis').value.trim();
+    const novoUput = editor.querySelector('.edit-uput').value.trim();
+    if (!noviNaziv) { editor.replaceWith(currentTitle); li.classList.remove('has-details'); return; }
     try {
       const res = await safeFetch(`${apiBaseRecept}/Izmeni/${id}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ naziv: noviNaziv, opis: '', vremePripreme: novoVreme, uputstvoPripreme: '', podKategorijaId: podId })
+        body: JSON.stringify({ naziv: noviNaziv, opis: noviOpis, vremePripreme: novoVreme, uputstvoPripreme: novoUput, podKategorijaId: podId })
       });
       if (!res) return;
       await loadRecepti();
