@@ -37,8 +37,9 @@ async function loadKategorije() {
         </span>
       `;
       li.addEventListener('click', () => {
-        window.location.href = `Podkategorija.html?categoryId=${k.id}&categoryName=${encodedName}`;
-      });
+      try { localStorage.setItem('lastCategory', JSON.stringify({ id: k.id, name: k.naziv })); } catch {}
+      window.location.href = `Podkategorija.html?categoryId=${k.id}&categoryName=${encodedName}`;
+    });
       lista.appendChild(li);
     });
   } catch (err) {
