@@ -1,104 +1,83 @@
-using System;
-using System.Collections.Generic;
-using FoodExplorer;
-using FoodExplorer.Controllers;
+using FoodExplorer.Data;
 using FoodExplorer.Models;
-using Neo4jClient;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using FoodExplorer.Models.Dto;
+using System.ComponentModel.DataAnnotations;
 
-namespace FoodExplorer.Modules
+
+
+public class KategorijaService : IKategorijaService
 {
-    public class KategorijaModule
-    {
-        private static IGraphClient _neo4JClient;
-       
-       private static ILogger _logger;
+    private readonly FoodExplorerContext _context;
 
-        public KategorijaModule(IGraphClient graphClient, ILogger logger)
+    public KategorijaService(FoodExplorerContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<Kategorija> CreateKategorijaAsync(KategorijaCreateDto dto)
+    {
+        var kategorija = new Kategorija
         {
-            _neo4JClient = graphClient;
-            _logger = logger;
-        }
+            Naziv = dto.Naziv
+        };
 
-public async IAsyncEnumerable<object> CreateKategorija(int id, string naziv)
-{
-    var obj = new object();
-    try
-    {
-        var query = await _neo4JClient.Cypher
-            .Create($"(m:Kategorija {{id: {id}, naziv: '{naziv}'}})")
-            .Return(m => m.As<Kategorija>())
-            .ResultsAsync;
+        _context.Kategorije.Add(kategorija);
+        await _context.SaveChangesAsync();
 
-        obj = query.SingleOrDefault();
-        _logger.LogInformation("Kategorija created successfully");
+        return kategorija;
     }
-    catch (Exception e)
+
+    public async Task<IEnumerable<Kategorija>> GetAllKategorijeAsync()
     {
-        _logger.LogError("Error creating Kategorija! " + e.Message);
+        return await _context.Kategorije
+                             .Include(x => x.Podkategorije)
+                             .ToListAsync();
     }
-    yield return obj;
+
+    public async Task<Kategorija?> GetIdAsync(int id)
+    {
+        return await _context.Kategorije
+                             .Include(x => x.Podkategorije)
+                             .FirstOrDefaultAsync(k => k.Id == id);
+                    
+    }
+
+    public async Task<Kategorija> UpdateKategorijaAsync(int id, KategorijaUpdateDto dto)
+    {
+        var entity = await _context.Kategorije.FindAsync(id);
+        if (entity == null)
+            throw new KeyNotFoundException($"Kategorija sa ID {id} nije pronađena");
+
+        if (string.IsNullOrWhiteSpace(dto.Naziv))
+            throw new ValidationException("Naziv ne sme biti prazan");
+
+        entity.Naziv = dto.Naziv;
+        await _context.SaveChangesAsync();
+        return new Kategorija{ Id = entity.Id, Naziv = entity.Naziv };
+    }
+
+    public async Task<bool> DeleteKategorijaAsync(int id)
+    {
+        var kategorija = await _context.Kategorije.FirstOrDefaultAsync(k => k.Id == id);
+        if (kategorija == null) return false;
+
+        _context.Kategorije.Remove(kategorija);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task AddPodkategorijaAsync(int podkategorijaId, int kategorijaId)
+    {
+        var kategorija = await _context.Kategorije.FirstOrDefaultAsync(k => k.Id == kategorijaId);
+        if (kategorija == null) throw new KeyNotFoundException("Kategorija nije pronađena");
+
+        var pod = await _context.Podkategorije.FirstOrDefaultAsync(p => p.Id == podkategorijaId);
+        if (pod == null) throw new KeyNotFoundException("Podkategorija nije pronađena");
+
+        pod.KategorijaId = kategorijaId;
+        await _context.SaveChangesAsync();
+    }
+
 }
-
-
-        public async IAsyncEnumerable<object> AddRecept(long receptId, long sastojakId)
-        {
-            var obj = new object();
-            try
-            {
-                obj = await _neo4JClient.Cypher.Match("(m:Recept), (reg: Sastojak)")
-                                                .Where("id(m)=$receptId and id(reg)=$sastojakId")
-                                                .WithParam("receptId",receptId)
-                                                .WithParam("sastojakId",sastojakId)
-                                                .Create("(m)-[r:SADRZI]->(reg)")
-                                                .With("m{.*, Id:id(m)} AS recept")
-                                                .Return(recept => recept.As<Recept>())
-                                                .ResultsAsync;
-            }
-            catch(Exception e)
-            {
-                _logger.LogError("Error adding recept! " + e.Message);
-            }
-            yield return obj;
-        } 
-
-        public async IAsyncEnumerable<object> ReturnKategorije()
-        {
-            var obj = await _neo4JClient.Cypher.Match("(m:Kategorija)")
-                                                .With("m{.*, Id:id(m)} AS kategorija")
-                                                .Return(kategorija => kategorija.As<Kategorija>())
-                                                .ResultsAsync;
-            var mappedResults = obj.Select(kategorija => new
-            {
-            kategorija.Id,
-            kategorija.Naziv,
-
-            });
-
-            yield return mappedResults;
-        }
-
-        public async IAsyncEnumerable<object> AddPodKategorija(long podkategorijaId, long kategorijaId)
-        {
-            var obj = new object();
-            try
-            {
-                obj = await _neo4JClient.Cypher.Match("(m:Podkategorija), (reg: Kategorija)")
-                                                .Where("id(m)=$podkategorijaId and id(reg)=$kategorijaId")
-                                                .WithParam("podkategorijaId",podkategorijaId)
-                                                .WithParam("kategorijaId",kategorijaId)
-                                                .Create("(m)-[r:PRIPRADA_KATEGORIJI]->(reg)")
-                                                .With("m{.*, Id:id(m)} AS podkategorija")
-                                                .Return(podkategorija => podkategorija.As<Podkategorija>())
-                                                .ResultsAsync;
-            }
-            catch(Exception e)
-            {
-                _logger.LogError("Error adding recept! " + e.Message);
-            }
-            yield return obj;
-        } 
-
-    }
- }

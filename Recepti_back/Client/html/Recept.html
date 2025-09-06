@@ -1,71 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodExplorer</title>
-    <link rel="stylesheet" href="still.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recepti</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="Recept.css">
 </head>
-<body>
-
-<div id="app">
-    <div class="flex-container">
-        <div class="left-panel">
-            <h2>Kreiranje recepata</h2>
-            <form id="createForm">
-                <label for="naziv">Naziv:</label>
-                <input type="text" name="naziv" required>
-                <label for="opis">Opis:</label>
-                <input type="text" name="opis" required>
-                <label for="vremePr">Vreme pripreme:</label>
-                <input type="number" name="vremePr" required>
-                <label for="kategorija">Kategorija:</label>
-                <input type="text" name="kategorija" required>
-                <label for="uputstvoPr">Uputstvo pripreme:</label>
-                <input type="text" name="uputstvoPr" required>
-                <button type="submit">Dodaj</button>
-            </form>
-
-            <h2>Izmeni recept</h2>
-            <form id="updateForm">
-                <label for="updateNaziv">Naziv:</label>
-                <input type="text" id="updateNazivInput" required>
-                <button type="button" id="fetchRecept">Prikazi podatke recepta</button>
-                <label for="updateOpis">Opis:</label>
-                <input type="text" id="updateOpis">
-                <label for="updateKategorija">Kategorija:</label>
-                <input type="text" id="updateKategorija">
-                <label for="updateUputstvo">Uputstvo Pripreme:</label>
-                <input type="text" id="updateUputstvo">
-                <button type="submit">Izmeni</button>
-            </form>
-            
-            
-            <h2>Dodaj sastojak receptu</h2>
-            <form id="sastojakForm">
-                <label for="naziv">Naziv recepta:</label>
-                <input type="text" name="naziv" required>
-                <label for="teams">Izaberite sastojak koji dodajete:</label>
-                <select id="sastojci" multiple>
-                </select>
-                <button type="submit">Dodaj</button>
-            </form>
-            
-            <h2>Brisanje recepta</h2>
-            <form id="deleteForm">
-                <label for="deleteNaziv">Naziv recepta:</label>
-                <input type="text" id="deleteNaziv" required>
-                <button type="submit">Obrisi</button>
-            </form>
-        </div>
-
-        <div class="right-panel">
-            <h2>Lista recepata</h2>
-            <ul id="receptList"></ul>
-        </div>
+<body class="page-shell">
+  <header class="top-header" role="banner">
+    <div class="top-header__inner">
+      <a href="Podkategorija.html" class="header-link">← Nazad na podkategorije</a>
+      <h1 class="top-header__title"><span id="podkategorijaNaziv">Podkategorija</span> — recepti</h1>
     </div>
-</div>
+  </header>
 
-<script src="../js/Recept.js"></script>
+  <main class="content-area" role="main">
+    <div class="container card-panel">
+      <section class="form-section" aria-labelledby="form-title">
+        <h2 id="form-title" class="section-title">Dodaj recept</h2>
+        <form id="receptForm" class="category-form" novalidate>
+          <div class="input-grid">
+            <input type="text" id="naziv" placeholder="Naziv recepta" required>
+            <input type="number" id="vreme" placeholder="Vreme pripreme (min)" required>
+            <input type="text" id="opis" placeholder="Kratak opis">
+            <textarea id="uputstvo" placeholder="Uputstvo pripreme"></textarea>
+            <button type="submit" class="primary-btn">Dodaj</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="list-section" aria-labelledby="list-title">
+        <h2 id="list-title" class="section-title">Lista recepata</h2>
+        <ul id="receptLista" class="category-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/Recept.js" defer></script>
 </body>
 </html>

@@ -1,98 +1,91 @@
-using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Caching.Memory;
+using FoodExplorer.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Neo4jClient;
+using FoodExplorer.Services;
+using System.Text.Json.Serialization;
 
 
 namespace FoodExplorer
 {
-    
     public class Startup
     {
-        
-        
+        private readonly IConfiguration _configuration;
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            //Neo4J connection
+            // PostgreSQL konekcija
+            services.AddDbContext<FoodExplorerContext>(options =>
+                options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection")));
 
-            var neo4JClient = new BoltGraphClient(new Uri("bolt://localhost:7687"), "neo4j", "12345678");
-            neo4JClient.ConnectAsync();
-            services.AddSingleton<IGraphClient>(neo4JClient);
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+                });
 
-            
+            services.AddScoped<IKategorijaService, KategorijaService>();
+            services.AddScoped<IPodkategorijaService, PodkategorijaService>();
+            services.AddScoped<IReceptService, ReceptEfService>();
 
-            services.AddControllers();
+
+            // Swagger konfiguracija
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FoodExplorer", Version = "v1" });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); 
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FoodExplorer API", Version = "v1" });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
-            services.AddMemoryCache();
 
-            ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.AddDebug();
-            });
+            services.AddMemoryCache();
             services.AddSignalR();
             services.AddLogging();
 
-            services.AddCors( options=>{
-                options.AddPolicy("CORS",builder=>
+            // CORS konfiguracija
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CORS", builder =>
                 {
-                    builder.WithOrigins("http:localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                    builder.WithOrigins(new string[]
-                    {
+                    builder.WithOrigins(
                         "http://localhost:8080",
-                        "http://localhost:8080",
-                        "http://127.0.0.1:8080",
                         "http://127.0.0.1:8080",
                         "http://localhost:5121",
                         "http://127.0.0.1:5501",
                         "http://localhost:5001",
                         "http://127.0.0.1:5001",
-                        "http://127.0.0.1:3000",
                         "http://localhost:3000",
-                        "http://127.0.0.1:3000",
-                        "http://localhost:3000",
-                        "http:localhost:3000"
-                    })
+                        "http://127.0.0.1:3000"
+                    )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
                 });
-});
-
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodExplorer v1"));
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseCors("CORS");
-
             app.UseAuthorization();
+
+            // Swagger
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodExplorer API v1");
+                c.RoutePrefix = "swagger";
+            });
 
             app.UseEndpoints(endpoints =>
             {

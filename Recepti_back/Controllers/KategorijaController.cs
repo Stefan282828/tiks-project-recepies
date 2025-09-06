@@ -1,140 +1,64 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Neo4jClient;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FoodExplorer.Models;
-using FoodExplorer.Modules;
-using Microsoft.Extensions.Logging;
+using FoodExplorer.Models.Dto;
 
 namespace FoodExplorer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Kategorija")]
     public class KategorijaController : ControllerBase
     {
-        private readonly IGraphClient _neo4JClient;
-        private static ILogger<KategorijaController> _logger;
-        private static KategorijaModule _modules;
-        public KategorijaController(IGraphClient neo4JClient, ILogger<KategorijaController> logger)
+        private readonly IKategorijaService _service;
+
+        public KategorijaController(IKategorijaService service)
         {
-             _modules = new KategorijaModule(neo4JClient, logger );
-            _neo4JClient = neo4JClient;
-            _logger = logger;
+            _service = service;
         }
 
-        [HttpPost("DodajKategoriju")]
-        public async Task<IActionResult> DodajKategoriju([FromBody] Kategorija novakategorija)
+        [HttpPost("Dodaj")]
+        public async Task<ActionResult<Kategorija>> Create([FromBody] KategorijaCreateDto dto)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                await _neo4JClient.Cypher
-                    .Create("(k:Kategorija $kategorijaParam)")
-                    .WithParam("kategorijaParam", novakategorija)
-                    .ExecuteWithoutResultsAsync();
-
-                return Ok("Kategorija uspešno dodata.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dodavanja kategorije: {ex.Message}");
-            }
+            var k = await _service.CreateKategorijaAsync(dto);
+            return Ok(k);
         }
 
- 
-        [HttpGet("VratiKategorije")]
-        public async Task<IActionResult> VratiKategorije()
+        [HttpGet("VratiSve")]
+        public async Task<ActionResult<IEnumerable<Kategorija>>> GetAll()
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var kategorije = await _neo4JClient.Cypher
-                    .Match("(kategorija:Kategorija)")
-                    .Return(kategorija => kategorija.As<Kategorija>())
-                    .ResultsAsync;
-
-                return Ok(kategorije);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja kategorije: {ex.Message}");
-            }
+            var kategorije = await _service.GetAllKategorijeAsync();
+            return Ok(kategorije);
+        }
+  
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Kategorija>> GetById(int id)
+        {
+            var kategorija = await _service.GetIdAsync(id);
+            if (kategorija == null) return NotFound();
+            return Ok(kategorija);
         }
 
-        [HttpGet]
-        [Route("VratiKategorijePoIdu/{id}")]
-        public async Task<IActionResult> KategorijaPoId(int id)
+        [HttpPut("Izmeni/{id}")]
+        public async Task<ActionResult<Kategorija>> Update(int id, [FromBody] KategorijaUpdateDto dto)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                var kategorija = await _neo4JClient.Cypher
-                    .Match("(kategorija:Kategorija)")
-                    .Where((Kategorija kategorija) => kategorija.Id == id)
-                    .Return(kategorija => kategorija.As<Kategorija>())
-                    .ResultsAsync;
-
-                return Ok(kategorija.SingleOrDefault());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja kategorije: {ex.Message}");
-            }
-        }
-        [HttpDelete]
-        [Route("ObrisiKategoriju/{naziv}")]
-        public async Task<IActionResult> Delete(string naziv)
-        {
-            await  _neo4JClient.Cypher.Match("(r:Kategorija)")
-                                 .Where((Kategorija r) => r.Naziv == naziv)
-                                 .Delete("r")
-                                 .ExecuteWithoutResultsAsync();
-            return Ok(new { Message = "Kategorija uspešno obrisana." });
-
+            var updated = await _service.UpdateKategorijaAsync(id, dto);
+            if (updated == null) return NotFound();
+            return Ok(updated);
         }
 
-        [HttpPut]
-        [Route("AzurirajKategoriju/{naziv}")]
-        public async Task<IActionResult> AzurirajKategoriju(string naziv, [FromBody] Kategorija azuriranaKategorija)
+        [HttpDelete("Obrisi/{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var query = await _neo4JClient.Cypher
-                    .Match("(kategorija:Kategorija)")
-                    .Where((Kategorija kategorija) => kategorija.Naziv == naziv)
-                    .Set("kategorija = $azuriranaKategorija")
-                    .WithParam("azuriranaKategorija", azuriranaKategorija)
-                    .Return(kategorija => kategorija.As<Kategorija>())
-                    .ResultsAsync;
-
-                var azurirana1Kategorija = query.SingleOrDefault();
-
-                if (azurirana1Kategorija == null)
-                {
-                    return NotFound($"Recept sa nazivom {naziv} nije pronađen.");
-                }
-
-                return Ok(azurirana1Kategorija);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Greška prilikom ažuriranja kategorije: {ex.Message}");
-                return BadRequest($"Greška prilikom ažuriranja kategorije: {ex.Message}");
-            }
-        }
-
-        [HttpPost("dodaj-podkategoriju-kategoriji/{podkategorijaId}/{kategorijaId}")]
-
-        public async Task<ActionResult> CreateRelationship(int podkategorijaId, int kategorijaId)
-        {
-            return Ok(_modules.AddPodKategorija(podkategorijaId,kategorijaId));
+            var deleted = await _service.DeleteKategorijaAsync(id);
+            if (!deleted) return NotFound();
+            return Ok("Kategorija obrisana!");
         }
     }
 }

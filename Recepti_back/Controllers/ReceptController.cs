@@ -1,156 +1,64 @@
 using Microsoft.AspNetCore.Mvc;
-using Neo4jClient;
 using FoodExplorer.Models;
-using FoodExplorer.Modules;
-
-
+using FoodExplorer.Models.Dto;
+using FoodExplorer.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoodExplorer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Recept")]
     public class ReceptController : ControllerBase
     {
-        private static IGraphClient _neo4JClient;
+        private readonly IReceptService _service;
+        public ReceptController(IReceptService service) { _service = service; }
 
-        private static ILogger<ReceptController> _logger;
-
-
-         private static ReceptModule _modules;
-
-
-        public ReceptController(IGraphClient neo4JClient,  ILogger<ReceptController> logger)
+        [HttpPost("Dodaj")]
+        public async Task<ActionResult<Recept>> Create([FromBody] ReceptCreateDto dto)
         {
-             _modules = new ReceptModule(neo4JClient, logger );
-            _neo4JClient = neo4JClient;
-            _logger = logger;
-            
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var created = await _service.CreateAsync(dto);
+            return Ok(created);
         }
 
-        [HttpPost("DodajRecept")]
-        public async Task<IActionResult> DodajRecept([FromBody] Recept novrecept)
+        [HttpGet("VratiSve")]
+        public async Task<ActionResult<IEnumerable<Recept>>> GetAll()
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                await _neo4JClient.Cypher
-                    .Create("(k:Recept $receptParam)")
-                    .WithParam("receptParam", novrecept)
-                    .ExecuteWithoutResultsAsync();
-
-                return Ok("Recept uspešno dodat.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dodavanja recepta: {ex.Message}");
-            }
+            var items = await _service.GetAllAsync();
+            return Ok(items);
         }
 
-        
-        [HttpGet("VratiRecepte")]
-        public async Task<IActionResult> VratiRecepte()
+        [HttpGet("ZaPodkategoriju/{podkategorijaId}")]
+        public async Task<ActionResult<IEnumerable<Recept>>> GetByPodkategorija(int podkategorijaId)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var recepti = await _neo4JClient.Cypher
-                    .Match("(recept:Recept)")
-                    .Return(recept => recept.As<Recept>())
-                    .ResultsAsync;
-
-                return Ok(recepti);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja podkategorija: {ex.Message}");
-            }
+            var items = await _service.GetByPodkategorijaAsync(podkategorijaId);
+            return Ok(items);
         }
 
-
-        [HttpGet]
-        [Route("VratiReceptPoNazivu/{name}")]
-        public async Task<IActionResult> ReceptPoNazivu(string name)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Recept>> GetById(int id)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var recept = await _neo4JClient.Cypher
-                    .Match("(recept:Recept)")
-                    .Where((Recept recept) => recept.Naziv == name)
-                    .Return(recept => recept.As<Recept>())
-                    .ResultsAsync;
-
-                return Ok(recept.SingleOrDefault());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Greška prilikom dohvatanja recepta: {ex.Message}");
-            }
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return Ok(item);
         }
 
-        [HttpDelete("ObrisiRecept/{naziv}")]
-        public async Task<IActionResult> Delete(string naziv)
+        [HttpPut("Izmeni/{id}")]
+        public async Task<ActionResult<Recept>> Update(int id, [FromBody] ReceptUpdateDto dto)
         {
-            await  _neo4JClient.Cypher.Match("(r:Recept)")
-                                 .Where((Recept r) => r.Naziv == naziv)
-                                 .Delete("r")
-                                 .ExecuteWithoutResultsAsync();
-            return Ok(new { Message = "Recept uspešno obrisan." });
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var updated = await _service.UpdateAsync(id, dto);
+            if (updated == null) return NotFound();
+            return Ok(updated);
         }
 
-        [HttpPut("UpdateRecept/{naziv}")]
-        public async Task<IActionResult> AzurirajRecept(string naziv, [FromBody] Recept azuriranRecept)
+        [HttpDelete("Obrisi/{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                await _neo4JClient.ConnectAsync();
-
-                var query = await _neo4JClient.Cypher
-                    .Match("(recept:Recept)")
-                    .Where((Recept recept) => recept.Naziv == naziv)
-                    .Set("recept = $azuriranRecept")
-                    .WithParam("azuriranRecept", azuriranRecept)
-                    .Return(recept => recept.As<Recept>())
-                    .ResultsAsync;
-
-                var azuriraniRecept = query.SingleOrDefault();
-
-                if (azuriraniRecept == null)
-                {
-                    return NotFound($"Recept sa nazivom {naziv} nije pronađen.");
-                }
-
-                return Ok(azuriraniRecept);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Greška prilikom ažuriranja recepta: {ex.Message}");
-                return BadRequest($"Greška prilikom ažuriranja recepta: {ex.Message}");
-            }
+            var ok = await _service.DeleteAsync(id);
+            if (!ok) return NotFound();
+            return Ok("Recept obrisan!");
         }
-
-        [HttpPost("dodaj-sastojak-receptu/{receptNaziv}/{sastojakId}")]
-
-        public async Task<ActionResult> CreateRelationship(string receptNaziv, int sastojakId)
-        {
-            return Ok(_modules.AddSastojak(receptNaziv,sastojakId));
-        }
-
-        [HttpPost("dodaj-podkategoriju-receptu/{receptId}/{podkategorijaId}")]
-
-        public async Task<ActionResult>  CreateRel(int receptId, int podkategorijaId)
-        {
-            return Ok(_modules.AddPodkategorija(receptId,podkategorijaId));
-        }
-
-
-
     }
-
-
-    
 }

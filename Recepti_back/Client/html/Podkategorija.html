@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Podkategorije</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="Podkategorija.css">
+</head>
+<body class="page-shell">
+  <header class="top-header" role="banner">
+    <div class="top-header__inner">
+      <a href="Kategorija.html" class="header-link">← Nazad na kategorije</a>
+      <h1 class="top-header__title"><span id="kategorijaNaziv">Kategorija</span> — podkategorije</h1>
+    </div>
+  </header>
+
+  <main class="content-area" role="main">
+    <div class="container card-panel">
+
+      <section class="form-section" aria-labelledby="form-title">
+        <h2 id="form-title" class="section-title">Dodaj podkategoriju</h2>
+        <form id="podkategorijaForm" class="category-form" novalidate>
+          <div class="input-row">
+            <label for="podNaziv" class="visually-hidden">Naziv podkategorije</label>
+            <input type="text" id="podNaziv" placeholder="npr. Pasta, Pizza, Lazanja" required>
+            <button type="submit" class="primary-btn">Dodaj</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="list-section" aria-labelledby="list-title">
+        <h2 id="list-title" class="section-title">Lista podkategorija</h2>
+        <ul id="podkategorijaLista" class="category-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/Podkategorija.js" defer></script>
+</body>
+</html>
