@@ -20,3 +20,9 @@
 .recipe-details .detail-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin: 8px 0; }
 .recipe-details .field-label { font-weight: 600; color:#111827; }
 .recipe-details .field-value { color:#374151; }
+
+.recipe-editor { width: 100%; margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; display: grid; gap: 10px; }
+.recipe-editor .form-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: start; }
+.recipe-editor input, .recipe-editor textarea { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+.recipe-editor textarea { min-height: 100px; resize: vertical; }
+.editor-actions { display: flex; gap: 8px; justify-content: flex-end; }
