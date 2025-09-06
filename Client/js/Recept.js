@@ -50,12 +50,31 @@ async function loadRecepti() {
       li.dataset.id = r.id;
       li.classList.add('clickable-item');
       li.innerHTML = `
-        <span class="item-title"><strong>${r.naziv}</strong> · ${r.vremePripreme} min</span>
+        <span class="item-title"><strong>${r.naziv}</strong> · ${r.vremePripreme ?? ''} ${r.vremePripreme ? 'min' : ''}</span>
         <span class="item-actions">
           <button onclick="event.stopPropagation(); window.editRecept(${r.id}, this)">✏️</button>
           <button onclick="event.stopPropagation(); window.deleteRecept(${r.id})">🗑️</button>
         </span>
       `;
+      li.addEventListener('click', async () => {
+        // toggle details
+        const existing = li.querySelector('.recipe-details');
+        if (existing) { existing.remove(); return; }
+        // fetch details if not fully present
+        let rec = r;
+        if (!rec.opis || !rec.uputstvoPripreme) {
+          const resp = await safeFetch(`${apiBaseRecept}/${r.id}`);
+          if (resp) rec = await resp.json();
+        }
+        const det = document.createElement('div');
+        det.className = 'recipe-details';
+        det.innerHTML = `
+          <div class="detail-row"><strong>Opis:</strong> ${rec.opis || '—'}</div>
+          <div class="detail-row"><strong>Vreme pripreme:</strong> ${rec.vremePripreme ?? '—'} ${rec.vremePripreme ? 'min' : ''}</div>
+          <div class="detail-row"><strong>Uputstvo:</strong> ${rec.uputstvoPripreme || '—'}</div>
+        `;
+        li.appendChild(det);
+      });
       lista.appendChild(li);
     });
   } catch (e) {
