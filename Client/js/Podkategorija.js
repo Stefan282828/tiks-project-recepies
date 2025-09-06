@@ -55,7 +55,8 @@ async function loadPodkategorije() {
       </span>
     `;
     li.addEventListener('click', () => {
-      window.location.href = `Recept.html?podId=${p.id}&podName=${encodedName}`;
+      const catName = encodeURIComponent(kategorijaNazivParam || '');
+      window.location.href = `Recept.html?podId=${p.id}&podName=${encodedName}&categoryId=${kategorijaId}&categoryName=${catName}`;
     });
     lista.appendChild(li);
   });
