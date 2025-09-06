@@ -1,7 +1,8 @@
 /* Theme: shared enhancements (keeps green rounded style) */
 :root { --radius: 12px; }
 
-/* Header back link (used across pages) */
+/* Header layout + back link (shared) */
+.top-header__inner { display: flex; align-items: center; gap: 12px; }
 .header-link { color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); transition: background .15s ease, border-color .15s ease; }
 .header-link:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.55); }
 
