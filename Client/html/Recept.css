@@ -14,5 +14,5 @@
 .offline-notice { display:none; padding:10px; border-radius:10px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7; }
 .offline-notice.show { display:block; }
 
-.recipe-details { margin-top: 10px; padding: 10px 12px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; color:#374151; }
-.recipe-details .detail-row { margin: 4px 0; }
+.recipe-details { margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; color:#374151; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+.recipe-details .detail-row { margin: 6px 0; }
