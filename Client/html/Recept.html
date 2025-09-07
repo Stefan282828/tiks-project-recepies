@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recepti</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="Recept.css">
+</head>
+<body class="page-shell">
+  <header class="top-header" role="banner">
+    <div class="top-header__inner">
+      <a href="Podkategorija.html" class="header-link">← Nazad na podkategorije</a>
+      <h1 class="top-header__title"><span id="podkategorijaNaziv">Podkategorija</span> — recepti</h1>
+    </div>
+  </header>
+
+  <main class="content-area" role="main">
+    <div class="container card-panel">
+      <div id="offlineNotice" class="offline-notice" aria-live="polite" style="display:none; margin-bottom:12px; padding:10px; border-radius:8px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7;">
+        <strong>Upozorenje:</strong> Backend nedostupan. Neke funkcionalnosti su onemogućene dok se server ne poveže.
+      </div>
+      <section class="form-section" aria-labelledby="form-title">
+        <h2 id="form-title" class="section-title">Dodaj recept</h2>
+        <form id="receptForm" class="category-form" novalidate>
+          <div class="input-grid">
+            <input type="text" id="naziv" placeholder="Naziv recepta" required>
+            <input type="number" id="vreme" placeholder="Vreme pripreme (min)" required>
+            <input type="text" id="opis" placeholder="Kratak opis">
+            <textarea id="uputstvo" placeholder="Uputstvo pripreme"></textarea>
+            <button type="submit" class="primary-btn">Dodaj</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="list-section" aria-labelledby="list-title">
+        <h2 id="list-title" class="section-title">Lista recepata</h2>
+        <ul id="receptLista" class="category-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/Recept.js" defer></script>
+</body>
+</html>

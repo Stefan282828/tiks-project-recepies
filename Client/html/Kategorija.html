@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kategorije</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="Kategorija.css">
+</head>
+<body class="page-shell">
+  <header class="top-header" role="banner">
+    <div class="top-header__inner">
+      <h1 class="top-header__title">Upravljanje kategorijama</h1>
+    </div>
+  </header>
+
+  <section class="hero-block hero-kategorija">
+    <div class="hero-inner">
+      <div>
+        <h2 class="hero-title">Organizuj svoje kulinarske ideje</h2>
+        <p class="hero-sub">Dodaj i uređuj kategorije recepata — brzo i jednostavno.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="content-area" role="main">
+    <div class="container card-panel">
+      <div id="offlineNotice" class="offline-notice" aria-live="polite" style="display:none; margin-bottom:12px; padding:10px; border-radius:8px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7;">
+        <strong>Upozorenje:</strong> Backend nedostupan. Neke funkcionalnosti su onemogućene dok se server ne poveže.
+      </div>
+      <section class="form-section" aria-labelledby="form-title">
+        <h2 id="form-title" class="section-title">Dodaj novu kategoriju</h2>
+        <form id="kategorijaForm" class="category-form" novalidate>
+          <div class="input-row">
+            <label for="naziv" class="visually-hidden">Naziv kategorije</label>
+            <input type="text" id="naziv" placeholder="Naziv kategorije" required>
+            <button type="submit" class="primary-btn">Dodaj</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="list-section" aria-labelledby="list-title">
+        <h2 id="list-title" class="section-title">Lista kategorija</h2>
+        <ul id="kategorijaLista" class="category-list"></ul>
+      </section>
+
+      <section class="media-aside" aria-label="ilustracije">
+        <figure class="media-card">
+          <img src="https://source.unsplash.com/800x600/?ingredients,flatlay" alt="Sastojci i pribor za kuvanje">
+          <figcaption class="media-caption">Nadahnite se idejama za nove kategorije.</figcaption>
+        </figure>
+        <figure class="media-card">
+          <img src="https://source.unsplash.com/800x600/?cook,recipe" alt="Kuvanje i priprema jela">
+          <figcaption class="media-caption">Napravite strukturu koja olakšava pretragu recepata.</figcaption>
+        </figure>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/Kategorija.js" defer></script>
+</body>
+</html>

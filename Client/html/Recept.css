@@ -1,0 +1,28 @@
+/* Base align with other pages */
+@import url('Kategorija.css');
+
+/* Override/add form grid for recipes */
+.input-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.input-grid textarea { min-height: 100px; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; resize: vertical; }
+
+/* Inline edit for recipe rows */
+.recipe-inline { display: grid; grid-template-columns: 1.2fr .6fr 1fr; gap: 10px; align-items: center; width: 100%; }
+.recipe-inline input, .recipe-inline textarea { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+
+@media (min-width: 740px) { .input-grid { grid-template-columns: 1fr 160px; } .input-grid textarea { grid-column: 1 / -1; } }
+
+.offline-notice { display:none; padding:10px; border-radius:10px; background:#fff6f6; color:#86181d; border:1px solid #f5c2c7; }
+.offline-notice.show { display:block; }
+
+.category-list li.has-details { flex-direction: column; align-items: stretch; }
+.category-list li.has-details .item-actions { align-self: flex-end; }
+.recipe-details { width: 100%; margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; color:#374151; white-space: pre-wrap; word-break: break-word; line-height: 1.5; max-height: 320px; overflow: auto; }
+.recipe-details .detail-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin: 8px 0; }
+.recipe-details .field-label { font-weight: 600; color:#111827; }
+.recipe-details .field-value { color:#374151; }
+
+.recipe-editor { width: 100%; margin-top: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; display: grid; gap: 10px; }
+.recipe-editor .form-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: start; }
+.recipe-editor input, .recipe-editor textarea { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+.recipe-editor textarea { min-height: 100px; resize: vertical; }
+.editor-actions { display: flex; gap: 8px; justify-content: flex-end; }
