@@ -1,4 +1,4 @@
-# FoodExplorer (tiks-project-recepies)
+# FoodExplorer Recipe Project
 
 ## What this project does
 FoodExplorer is a recipe management application built around three core entities:
