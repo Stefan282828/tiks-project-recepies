@@ -56,7 +56,7 @@ The project is meant to be a practical full-stack learning and portfolio applica
 - Tests:
   - `dotnet test Recepti.Tests/Recepti.Tests.csproj`
 
-> Note: In this environment, running tests may require installing the .NET 7 runtime.
+> Note: This project targets .NET 7. If your environment only has newer runtimes (for example .NET 8+), install the .NET 7 runtime first: https://dotnet.microsoft.com/en-us/download/dotnet/7.0
 
 ## Project description (portfolio-ready)
 Designed and implemented a recipe-management web application with ASP.NET Core and Entity Framework Core, delivering CRUD workflows for categories, subcategories, and recipes through a clean controller/service/data architecture. Modeled relational data in PostgreSQL with enforced entity relationships and validation-aware DTO-based request handling. Integrated Swagger for API exploration, added service-layer tests with NUnit, and built a lightweight JavaScript + HTML/CSS client for browsing and managing recipe structures end to end.
