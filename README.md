@@ -39,6 +39,7 @@ The project is meant to be a practical full-stack learning and portfolio applica
   - NUnit
 - **Database**: PostgreSQL (configured through `DefaultConnection`)
 - **Additional package references in project**: Neo4j.Driver, Neo4jClient, MemoryCache
+  - Neo4j packages are currently tied to an extra/legacy service module (`ReceptService.cs`), while the active API CRUD flow uses EF Core + PostgreSQL (`ReceptEfService`).
 
 ## Quick start
 1. Configure PostgreSQL and update connection string in:
