@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodExplorer - Sastojci</title>
+    <link rel="stylesheet" href="stillsastojak.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">FoodExplorer</div>
+            <ul class="nav-links">
+                <li><a href="Recept.html">Recepti</a></li>
+                <li><a href="Sastojak.html" class="active">Sastojci</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Kreiranje sastojka</h2>
+            <form>
+                <label for="naziv">Naziv:</label>
+                <input type="text" id="naziv" placeholder="Unesi sastojak">
+                <button type="submit">Dodaj</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Izmeni sastojak</h2>
+            <form>
+                <label for="nazivStari">Naziv:</label>
+                <input type="text" id="nazivStari" placeholder="Stari naziv">
+                <label for="nazivNovi">Novi naziv:</label>
+                <input type="text" id="nazivNovi" placeholder="Novi naziv">
+                <button type="submit">Izmeni</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Brisanje sastojka</h2>
+            <form>
+                <label for="nazivBrisanje">Naziv sastojka:</label>
+                <input type="text" id="nazivBrisanje" placeholder="Naziv za brisanje">
+                <button type="submit" class="danger">Obriši</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Lista sastojaka</h2>
+            <ul id="listaSastojaka">
+                <li>Primer sastojak 1</li>
+                <li>Primer sastojak 2</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
